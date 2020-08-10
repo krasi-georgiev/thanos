@@ -486,6 +486,15 @@ func (qapi *QueryAPI) series(r *http.Request) (interface{}, []error, *api.ApiErr
 		return nil, nil, &api.ApiError{Typ: api.ErrorBadData, Err: err}
 	}
 
+	var step time.Duration
+	if t := r.FormValue("step"); t != "" {
+		var err error
+		step, err = parseDuration(t)
+		if err != nil {
+			return nil, nil, &ApiError{errorBadData, err}
+		}
+	}
+
 	var matcherSets [][]*labels.Matcher
 	for _, s := range r.Form["match[]"] {
 		matchers, err := parser.ParseMetricSelector(s)
@@ -526,8 +535,14 @@ func (qapi *QueryAPI) series(r *http.Request) (interface{}, []error, *api.ApiErr
 		metrics = []labels.Labels{}
 		sets    []storage.SeriesSet
 	)
+
+	hints := &storage.SelectHints{
+		Start: timestamp.FromTime(start),
+		End:   timestamp.FromTime(end),
+		Step:  int64(step),
+	}
 	for _, mset := range matcherSets {
-		sets = append(sets, q.Select(false, nil, mset...))
+		sets = append(sets, q.Select(false, hints, mset...))
 	}
 
 	set := storage.NewMergeSeriesSet(sets, storage.ChainedSeriesMerge)
