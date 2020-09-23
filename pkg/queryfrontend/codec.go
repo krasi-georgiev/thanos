@@ -114,6 +114,7 @@ func (c codec) DecodeRequest(_ context.Context, r *http.Request) (queryrange.Req
 	}
 
 	result.Query = r.FormValue("query")
+	result.SplitInterval = r.FormValue("splitInterval")
 	result.Path = r.URL.Path
 
 	for _, value := range r.Header.Values(cacheControlHeader) {

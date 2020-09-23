@@ -82,6 +82,8 @@ replace (
 	google.golang.org/grpc => google.golang.org/grpc v1.29.1
 	k8s.io/klog => k8s.io/klog v0.3.1
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20190228160746-b3a7cee44a30
+
+	github.com/cortexproject/cortex => ../../cortexproject/cortex
 )
 
 go 1.15

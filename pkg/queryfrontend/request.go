@@ -27,6 +27,7 @@ type ThanosRequest struct {
 	ReplicaLabels       []string
 	StoreMatchers       [][]storepb.LabelMatcher
 	CachingOptions      queryrange.CachingOptions
+	SplitInterval       string
 }
 
 // GetStart returns the start timestamp of the request in milliseconds.
@@ -84,6 +85,11 @@ func (r *ThanosRequest) LogToSpan(sp opentracing.Span) {
 	}
 
 	sp.LogFields(fields...)
+}
+
+// GetEnd returns the end timestamp of the request in milliseconds.
+func (r *ThanosRequest) GetSplitInterval() string {
+	return r.SplitInterval
 }
 
 // Reset implements proto.Message interface required by queryrange.Request,

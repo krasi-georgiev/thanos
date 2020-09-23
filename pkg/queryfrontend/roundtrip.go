@@ -4,6 +4,7 @@
 package queryfrontend
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -58,17 +59,23 @@ func NewTripperware(
 
 	codec := NewThanosCodec(config.PartialResponseStrategy)
 
-	if config.SplitQueriesByInterval != 0 {
-		// TODO(yeya24): make interval dynamic in next pr.
-		queryIntervalFn := func(_ queryrange.Request) time.Duration {
-			return config.SplitQueriesByInterval
+	queryIntervalFn := func(r queryrange.Request) time.Duration {
+		interval := r.GetSplitInterval()
+		dur, err := time.ParseDuration(interval)
+		if err == nil {
+			return dur
 		}
-		queryRangeMiddleware = append(
-			queryRangeMiddleware,
-			queryrange.InstrumentMiddleware("split_by_interval", metrics),
-			queryrange.SplitByIntervalMiddleware(queryIntervalFn, limits, codec, reg),
-		)
+		if err != nil {
+			fmt.Println("Error parsing interval", interval, err)
+		}
+		fmt.Println(">>>>> using the config split interval", config.SplitQueriesByInterval)
+		return config.SplitQueriesByInterval
 	}
+	queryRangeMiddleware = append(
+		queryRangeMiddleware,
+		queryrange.InstrumentMiddleware("split_by_interval", metrics),
+		queryrange.SplitByIntervalMiddleware(queryIntervalFn, limits, codec, reg),
+	)
 
 	if config.CortexResultsCacheConfig != nil {
 		queryCacheMiddleware, _, err := queryrange.NewResultsCacheMiddleware(
