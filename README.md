@@ -13,6 +13,12 @@
 [![react](https://github.com/thanos-io/thanos/workflows/react/badge.svg)](https://github.com/thanos-io/thanos/actions?query=workflow%3Areact)
 [![docs](https://github.com/thanos-io/thanos/workflows/docs/badge.svg)](https://github.com/thanos-io/thanos/actions?query=workflow%3Adocs)
 
+
+
+
+
+
+
 ## Overview
 
 Thanos is a set of components that can be composed into a highly available metric
